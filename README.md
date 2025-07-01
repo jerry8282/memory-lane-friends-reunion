@@ -1,73 +1,107 @@
-# Welcome to your Lovable project
+# **[반갑다 친구야](https://memory-lane-friends-reunion.lovable.app)**
 
-## Project info
+## **페르소나**
 
-**URL**: https://lovable.dev/projects/e0ce5fdc-abaf-4680-95d1-a5771d4a315d
+### **바쁜 직장인 - 조현석 (26세)**
 
-## How can I edit this code?
+- **직업**: IT 회사 개발자
+- **라이프스타일**: 매일 출퇴근, 점심시간 30분, 퇴근 후 피곤함, 외로움
+- **목표**: 바쁜 생활에 치어 예전에 친했던 사람들을 다시 만나고 싶음
+- **니즈**: 많이 친했지만 전화번호가 없거나 전화번호를 바꾼 사람들을 보고싶음
+- **페인 포인트**: 추억회상, 사람을 만나고 싶음
 
-There are several ways of editing your application.
+### **사용자 시나리오 및 스토리**
 
-**Use Lovable**
+### **바쁜 직장인의 하루**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e0ce5fdc-abaf-4680-95d1-a5771d4a315d) and start prompting.
+> **상황**: 바쁜 직장생황을 한 조현석이 바쁜 생황에 치어 연락을 못했던 한 때 친했던 정예준씨를 다시 보고 싶어함
 
-Changes made via Lovable will be committed automatically to this repo.
+**사용자 시나리오**:
 
-**Use your preferred IDE**
+1. 스마트폰에서 반갑다 친구야 접속
+2. 처음 들어갈 시에 로그인화면과 회원가입이 있음
+3. 로그인을 하게 되면 한 때 친했던 년도 및 시간대를 입력 및 친했던 주소 입력
+4. 입력을 하게 되면 오차 범위 내에 비슷한 년도를 적은 사람들의 목록을 나열
+5. 해당하는 인물 옆에 반갑다 친구야 버튼을 클릭 후 상대가 수락을 하게 되면 채팅창 활성화 가능
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+**사용자 스토리**:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+> "한 때 친했지만 현실에 치여 제대로 연락하지 못하였던 친구를 다시 만나고 싶습니다."
+> 
 
-Follow these steps:
+**인수 조건**:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Given: 사용자가 보고싶다 친구야에 접속했을 때
+- When: 친했던 년도 및 시간대를 입력 및 친했던 주소를 입력했을 때
+- Then: 3초 이내에 해당 시기에 해당 장소에 있었던 사람들의 목록을 추릴 수 있게 된다.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### **핵심 가치 제안**
 
-# Step 3: Install the necessary dependencies.
-npm i
+> 바쁜 일상 속에서도, 그리운 사람들과 다시 연결될 수 있는 감성 기반 소셜 플랫폼
+> 
+- **잊혀진 인연을 데이터 기반으로 되찾을 수 있는 서비스**
+- 전화번호, SNS 계정 없이도 **기억 속 시공간 정보**만으로 사람을 찾을 수 있음
+- 단순한 연락처 검색이 아닌, **추억과 연결된 사람 중심 탐색** 기능 제공
+- 바쁜 직장인들이 짧은 여유 시간에 추억을 회상하고 소통할 수 있도록 최적화된 UX 제공
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+💡 **팁**: 테스트하려면 기본 목업 데이터로 랜덤하게 사용자들이 있음
 
-**Edit a file directly in GitHub**
+### **핵심 기능**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **회원가입 및 로그인**
 
-**Use GitHub Codespaces**
+- 이메일/비밀번호 기반 로그인 및 소셜 로그인 (예: Google, Kakao)
+- 신규 사용자는 기본 프로필 정보 입력 (이름, 생년월일, 닉네임 등)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. **기억 기반 인연 탐색**
 
-## What technologies are used for this project?
+- 사용자가 기억하는 정보 입력 화면
+    - 친했던 **년도** (예: 2015~2017)
+    - 친했던 **시간대** (예: 중학생 때, 군대 때, 첫 회사 입사 초기)
+    - **장소 정보** (지번주소 또는 건물 이름, 대략적인 지역명)
+- 입력된 정보를 기반으로 조건이 유사한 사용자 목록 필터링
 
-This project is built with:
+3. **유사 인연 매칭 로직**
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- 입력 정보(년도, 시간대, 장소) 기반 유사도 점수 계산
+- 유사도가 일정 기준 이상일 경우 목록에 노출
+- 각 사용자 옆에 `👋 반갑다 친구야` 버튼 표시
 
-## How can I deploy this project?
+4. **인연 요청 및 수락 기능**
 
-Simply open [Lovable](https://lovable.dev/projects/e0ce5fdc-abaf-4680-95d1-a5771d4a315d) and click on Share -> Publish.
+- `반갑다 친구야` 요청 전송 → 상대방에게 알림
+- 상대방이 수락할 경우 양방향 연결 성사
+- 수락 시, 채팅창 자동 생성 및 알림 전송
 
-## Can I connect a custom domain to my Lovable project?
+5. **채팅 기능**
 
-Yes, you can!
+- 실시간 텍스트 채팅 가능 (Firebase 또는 WebSocket 기반)
+- 대화창에는 당시 기억(공통 입력 정보) 함께 표시 → 대화 흐름을 자연스럽게
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+6. **사용자 익명성 및 프라이버시 보호**
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- 기본적으로 **닉네임 기반 노출**
+- 채팅 수락 전까지는 **실명, 프로필 사진 등 비공개**
+- 사용자가 차단 및 신고 가능
+
+7. **랜덤 추억 친구 탐색 (목업용)**
+
+- 테스트용으로 랜덤한 목업 사용자들 목록 자동 생성
+- 다양한 연도/장소 조합으로 테스트 가능
+- (예: `2009년 서울역`, `2012년 대전 둔산동 중학교` 등)
+
+8. **내 인연 관리**
+
+- 요청한 인연 리스트 보기
+- 수락한 인연/차단한 인연 목록 관리
+- 각 인연별 채팅 히스토리 확인
+
+### **핵심 사용자 경험 요약 (UX Focus)**
+
+- **"기억" 기반의 검색**: 시간과 장소만으로 사람을 찾을 수 있음
+- **"감정" 기반의 접근**: 단순한 만남이 아니라 "그리움"을 자극
+- **"쉬운 사용성"**: 점심시간 30분, 퇴근 후 10분 등 바쁜 생활 속 짧은 시간에도 사용 가능
+
+### **구현 범위**
+
+- 테스트를 위해 사용자들 목록을 목업(Mocking) 데이터로 구현
