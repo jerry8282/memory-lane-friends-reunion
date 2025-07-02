@@ -2,14 +2,24 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Heart, MapPin, Clock, Users } from 'lucide-react';
+import { Heart, MapPin, Clock, Users, LogOut } from 'lucide-react';
 import MemorySearch from '@/components/MemorySearch';
 import FriendMatches from '@/components/FriendMatches';
 import ProfileSetup from '@/components/ProfileSetup';
+import AuthScreen from '@/components/AuthScreen';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'search' | 'matches' | 'profile'>('home');
-  const [userProfile, setUserProfile] = useState(null);
+  const [currentView, setCurrentView] = useState<'home' | 'search' | 'matches' | 'profile' | 'auth'>('home');
+  const { user, logout, isAuthenticated } = useAuth();
+
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      logout();
+    } else {
+      setCurrentView('auth');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -21,19 +31,38 @@ const Index = () => {
               <Heart className="w-6 h-6 text-purple-500" />
               <h1 className="text-lg font-bold text-gray-800">반갑다 친구야</h1>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setCurrentView('profile')}
-              className="text-purple-600"
-            >
-              프로필
-            </Button>
+            <div className="flex items-center gap-2">
+              {isAuthenticated && (
+                <>
+                  <span className="text-sm text-gray-600">안녕하세요, {user?.nickname}님</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setCurrentView('profile')}
+                    className="text-purple-600"
+                  >
+                    프로필
+                  </Button>
+                </>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleAuthAction}
+                className={isAuthenticated ? "text-red-600" : "text-purple-600"}
+              >
+                {isAuthenticated ? <LogOut className="w-4 h-4" /> : '로그인'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-md mx-auto px-4 pb-6">
+        {currentView === 'auth' && (
+          <AuthScreen onBack={() => setCurrentView('home')} />
+        )}
+
         {currentView === 'home' && (
           <div className="space-y-6 pt-6">
             {/* Welcome Section */}
@@ -42,7 +71,9 @@ const Index = () => {
                 <Users className="w-10 h-10 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">그때 그 친구를 찾아보세요</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  {isAuthenticated ? `${user?.nickname}님, 그때 그 친구를 찾아보세요` : '그때 그 친구를 찾아보세요'}
+                </h2>
                 <p className="text-gray-600 leading-relaxed">
                   기억 속 장소와 시간만으로<br />
                   잊지 못한 친구와 다시 만나보세요
@@ -83,10 +114,10 @@ const Index = () => {
 
             {/* CTA Button */}
             <Button 
-              onClick={() => setCurrentView('search')}
+              onClick={() => isAuthenticated ? setCurrentView('search') : setCurrentView('auth')}
               className="w-full h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
-              친구 찾기 시작하기 🌸
+              {isAuthenticated ? '친구 찾기 시작하기 🌸' : '로그인하고 친구 찾기 🌸'}
             </Button>
 
             {/* Stats */}
@@ -122,8 +153,11 @@ const Index = () => {
         {currentView === 'profile' && (
           <ProfileSetup 
             onBack={() => setCurrentView('home')}
-            profile={userProfile}
-            onSave={setUserProfile}
+            profile={user?.profile || null}
+            onSave={(profile) => {
+              // 프로필 업데이트 로직은 이미 ProfileSetup 컴포넌트에서 처리됨
+              setCurrentView('home');
+            }}
           />
         )}
       </div>
