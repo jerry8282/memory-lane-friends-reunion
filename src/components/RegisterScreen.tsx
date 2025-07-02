@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,8 +80,11 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onBack }) => {
     setIsLoading(true);
     
     try {
-      const userData = {
-        ...basicInfo,
+      const userData: any = {
+        email: basicInfo.email,
+        password: basicInfo.password,
+        nickname: basicInfo.nickname,
+        name: basicInfo.name,
         birthYear: parseInt(basicInfo.birthYear),
         profile: {
           rememberedYears: {
@@ -97,6 +99,11 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onBack }) => {
           activityKeywords: []
         }
       };
+
+      // Only include gender if it's selected
+      if (basicInfo.gender && (basicInfo.gender === 'male' || basicInfo.gender === 'female')) {
+        userData.gender = basicInfo.gender;
+      }
 
       const success = await register(userData);
       if (success) {
