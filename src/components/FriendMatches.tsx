@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,28 +5,111 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, MapPin, Calendar, Heart, MessageCircle } from 'lucide-react';
 import { mockFriends } from '@/data/mockData';
 
-interface FriendMatchesProps {
-  onBack: () => void;
+interface Friend {
+  id: number;
+  nickname: string;
+  year: number;
+  period: string;
+  location: string;
+  additionalInfo: string;
+  bio: string;
 }
 
-const FriendMatches: React.FC<FriendMatchesProps> = ({ onBack }) => {
-  const [matches, setMatches] = useState<any[]>([]);
+interface SearchCriteria {
+  year: number;
+  period: string;
+  location: string;
+  keywords: string[];
+}
+
+interface FriendMatchesProps {
+  onBack: () => void;
+  searchCriteria?: SearchCriteria;
+}
+
+const FriendMatches: React.FC<FriendMatchesProps> = ({ onBack, searchCriteria }) => {
+  const [matches, setMatches] = useState<Array<Friend & { matchScore: number }>>([]);
   const [sentRequests, setSentRequests] = useState<Set<number>>(new Set());
 
+  const calculateMatchScore = (friend: Friend, criteria: SearchCriteria): number => {
+    let score = 0;
+    
+    // 연도 매칭 (30점)
+    if (friend.year === criteria.year) {
+      score += 30;
+    } else {
+      // 연도가 가까울수록 부분 점수 부여
+      const yearDiff = Math.abs(friend.year - criteria.year);
+      if (yearDiff <= 2) {
+        score += Math.max(0, 30 - (yearDiff * 10));
+      }
+    }
+
+    // 기간(학년) 매칭 (25점)
+    if (friend.period === criteria.period) {
+      score += 25;
+    } else if (friend.period.includes(criteria.period) || criteria.period.includes(friend.period)) {
+      score += 15; // 부분 일치
+    }
+
+    // 지역 매칭 (25점)
+    const friendLocation = friend.location.split(' ');
+    const criteriaLocation = criteria.location.split(' ');
+    
+    if (friend.location === criteria.location) {
+      score += 25;
+    } else {
+      // 시/도가 같으면 10점
+      if (friendLocation[0] === criteriaLocation[0]) {
+        score += 10;
+        // 구까지 같으면 추가 10점
+        if (friendLocation[1] === criteriaLocation[1]) {
+          score += 10;
+        }
+      }
+    }
+
+    // 추가 정보 키워드 매칭 (20점)
+    const additionalInfoLower = friend.additionalInfo.toLowerCase();
+    const bioLower = friend.bio.toLowerCase();
+    let keywordMatches = 0;
+
+    criteria.keywords.forEach(keyword => {
+      const keywordLower = keyword.toLowerCase();
+      if (additionalInfoLower.includes(keywordLower) || bioLower.includes(keywordLower)) {
+        keywordMatches++;
+      }
+    });
+
+    if (keywordMatches > 0) {
+      score += Math.min(20, (keywordMatches / criteria.keywords.length) * 20);
+    }
+
+    return Math.round(score);
+  };
+
   useEffect(() => {
-    // 실제로는 검색 조건에 맞는 매칭 로직이 들어갈 곳
-    setMatches(mockFriends.slice(0, 8));
-  }, []);
+    if (!searchCriteria) {
+      setMatches(mockFriends.slice(0, 8).map(friend => ({ ...friend, matchScore: 70 })));
+      return;
+    }
+
+    const matchedFriends = mockFriends
+      .map(friend => ({
+        ...friend,
+        matchScore: calculateMatchScore(friend, searchCriteria)
+      }))
+      .filter(friend => friend.matchScore >= 40) // 최소 40점 이상인 매칭만 표시
+      .sort((a, b) => b.matchScore - a.matchScore) // 매칭 점수 높은 순으로 정렬
+      .slice(0, 8); // 상위 8명만 표시
+
+    setMatches(matchedFriends);
+  }, [searchCriteria]);
 
   const handleSendRequest = (friendId: number) => {
     setSentRequests(prev => new Set([...prev, friendId]));
     // 실제로는 서버에 요청을 보내는 로직
     console.log('친구 요청 전송:', friendId);
-  };
-
-  const getMatchPercentage = (friend: any) => {
-    // 간단한 매칭 점수 계산 (실제로는 더 복잡한 로직)
-    return Math.floor(Math.random() * 30) + 70;
   };
 
   return (
@@ -57,7 +139,6 @@ const FriendMatches: React.FC<FriendMatchesProps> = ({ onBack }) => {
 
       <div className="space-y-4">
         {matches.map((friend) => {
-          const matchPercentage = getMatchPercentage(friend);
           const isRequestSent = sentRequests.has(friend.id);
           
           return (
@@ -70,9 +151,9 @@ const FriendMatches: React.FC<FriendMatchesProps> = ({ onBack }) => {
                         <h4 className="font-semibold text-gray-800">{friend.nickname}</h4>
                         <Badge 
                           variant="secondary" 
-                          className={`text-xs ${matchPercentage >= 85 ? 'bg-pink-100 text-pink-600' : 'bg-purple-100 text-purple-600'}`}
+                          className={`text-xs ${friend.matchScore >= 85 ? 'bg-pink-100 text-pink-600' : 'bg-purple-100 text-purple-600'}`}
                         >
-                          {matchPercentage}% 일치
+                          {friend.matchScore}% 일치
                         </Badge>
                       </div>
                       
