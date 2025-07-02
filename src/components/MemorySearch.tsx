@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,13 +5,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Search, MapPin, Calendar, GraduationCap } from 'lucide-react';
 
+interface SearchData {
+  year: string;
+  period: string;
+  location: string;
+  additionalInfo: string;
+}
+
 interface MemorySearchProps {
   onBack: () => void;
-  onSearchComplete: () => void;
+  onSearchComplete: (searchData: SearchData) => void;
 }
 
 const MemorySearch: React.FC<MemorySearchProps> = ({ onBack, onSearchComplete }) => {
-  const [searchData, setSearchData] = useState({
+  const [searchData, setSearchData] = useState<SearchData>({
     year: '',
     period: '',
     location: '',
@@ -22,8 +28,8 @@ const MemorySearch: React.FC<MemorySearchProps> = ({ onBack, onSearchComplete })
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('검색 데이터:', searchData);
-    onSearchComplete();
-  };
+    onSearchComplete(searchData);
+  }; 
 
   const periodOptions = [
     '초등학교 저학년 (1-3학년)',

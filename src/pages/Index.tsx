@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -11,9 +10,17 @@ import ReceivedRequests from '@/components/ReceivedRequests';
 import ChatScreen from '@/components/ChatScreen';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface SearchData {
+  year: string;
+  period: string;
+  location: string;
+  additionalInfo: string;
+}
+
 const Index = () => {
   const [currentView, setCurrentView] = useState<'home' | 'search' | 'matches' | 'profile' | 'auth' | 'requests' | 'chat'>('home');
   const [chatFriend, setChatFriend] = useState<any>(null);
+  const [searchData, setSearchData] = useState<SearchData | null>(null);
   const { user, logout, isAuthenticated } = useAuth();
 
   const handleAuthAction = () => {
@@ -27,6 +34,11 @@ const Index = () => {
   const handleStartChat = (friendId: number, friendInfo: any) => {
     setChatFriend(friendInfo);
     setCurrentView('chat');
+  };
+
+  const handleSearchComplete = (data: SearchData) => {
+    setSearchData(data);
+    setCurrentView('matches');
   };
 
   return (
@@ -188,13 +200,19 @@ const Index = () => {
         {currentView === 'search' && (
           <MemorySearch 
             onBack={() => setCurrentView('home')}
-            onSearchComplete={() => setCurrentView('matches')}
+            onSearchComplete={handleSearchComplete}
           />
         )}
 
         {currentView === 'matches' && (
           <FriendMatches 
             onBack={() => setCurrentView('search')}
+            searchCriteria={searchData ? {
+              year: parseInt(searchData.year),
+              period: searchData.period,
+              location: searchData.location,
+              keywords: searchData.additionalInfo.split(/[\s,]+/).filter(Boolean)
+            } : undefined}
           />
         )}
 
