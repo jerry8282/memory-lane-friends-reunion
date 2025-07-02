@@ -2,15 +2,18 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Heart, MapPin, Clock, Users, LogOut } from 'lucide-react';
+import { Heart, MapPin, Clock, Users, LogOut, MessageCircle } from 'lucide-react';
 import MemorySearch from '@/components/MemorySearch';
 import FriendMatches from '@/components/FriendMatches';
 import ProfileSetup from '@/components/ProfileSetup';
 import AuthScreen from '@/components/AuthScreen';
+import ReceivedRequests from '@/components/ReceivedRequests';
+import ChatScreen from '@/components/ChatScreen';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'search' | 'matches' | 'profile' | 'auth'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'search' | 'matches' | 'profile' | 'auth' | 'requests' | 'chat'>('home');
+  const [chatFriend, setChatFriend] = useState<any>(null);
   const { user, logout, isAuthenticated } = useAuth();
 
   const handleAuthAction = () => {
@@ -19,6 +22,11 @@ const Index = () => {
     } else {
       setCurrentView('auth');
     }
+  };
+
+  const handleStartChat = (friendId: number, friendInfo: any) => {
+    setChatFriend(friendInfo);
+    setCurrentView('chat');
   };
 
   return (
@@ -63,6 +71,20 @@ const Index = () => {
           <AuthScreen onBack={() => setCurrentView('home')} />
         )}
 
+        {currentView === 'requests' && (
+          <ReceivedRequests 
+            onBack={() => setCurrentView('home')}
+            onStartChat={handleStartChat}
+          />
+        )}
+
+        {currentView === 'chat' && chatFriend && (
+          <ChatScreen 
+            onBack={() => setCurrentView('requests')}
+            friendInfo={chatFriend}
+          />
+        )}
+
         {currentView === 'home' && (
           <div className="space-y-6 pt-6">
             {/* Welcome Section */}
@@ -80,6 +102,32 @@ const Index = () => {
                 </p>
               </div>
             </div>
+
+            {/* Notification for received requests */}
+            {isAuthenticated && (
+              <Card className="border-blue-100 bg-blue-50 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-blue-800">받은 인연 요청</h3>
+                        <p className="text-sm text-blue-600">5개의 새로운 요청이 있어요</p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => setCurrentView('requests')}
+                      size="sm"
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                      확인하기
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Feature Cards */}
             <div className="space-y-3">
@@ -155,7 +203,6 @@ const Index = () => {
             onBack={() => setCurrentView('home')}
             profile={user?.profile || null}
             onSave={(profile) => {
-              // 프로필 업데이트 로직은 이미 ProfileSetup 컴포넌트에서 처리됨
               setCurrentView('home');
             }}
           />
