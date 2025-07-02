@@ -34,10 +34,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onForgotPassword }) =
           description: "환영합니다! 다시 만날 인연을 찾으러 가볼까요?",
         });
         
-        // 0.5초 후 메인 화면으로 자동 이동
+        // 상태 업데이트를 위해 약간의 지연 후 메인 화면으로 이동
         setTimeout(() => {
           onBack(); // 메인 화면으로 돌아가기
-        }, 500);
+        }, 100); // 짧은 지연으로 상태 업데이트 보장
       } else {
         toast({
           title: "로그인 실패",

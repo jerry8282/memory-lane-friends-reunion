@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -112,10 +113,10 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onBack }) => {
           description: "가입이 완료되었습니다! 당신의 추억을 불러오는 중이에요...",
         });
         
-        // 1초 후 메인 화면으로 자동 이동
+        // 상태 업데이트를 위해 약간의 지연 후 메인 화면으로 이동
         setTimeout(() => {
           onBack(); // 메인 화면으로 돌아가기
-        }, 1000);
+        }, 200); // 짧은 지연으로 상태 업데이트 보장
       } else {
         toast({
           title: "회원가입 실패",
