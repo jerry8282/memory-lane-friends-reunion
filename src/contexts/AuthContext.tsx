@@ -38,12 +38,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // 로컬 스토리지에서 사용자 정보 로드
-    const savedUser = localStorage.getItem('bangapda_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+  // ✅ 자동 로그인용 하드코딩
+  const mockUser: User = {
+    id: 'test-id-1234',
+    email: 'test@example.com',
+    nickname: '테스트유저',
+    name: '홍길동',
+    birthYear: 1995,
+    gender: 'male',
+    profile: {
+      currentLocation: '서울',
+      oldNickname: '길동이',
+      memorablePlaces: ['중앙초등학교', '동네 놀이터'],
+      activityKeywords: ['축구', '만화책'],
+      rememberedYears: {
+        startYear: 2003,
+        endYear: 2006,
+        timeDescription: '초등학교 시절',
+      },
+      rememberedLocation: '노원구',
+      schoolOrWork: '중앙초등학교',
+    },
+  };
+
+  setUser(mockUser);
+  localStorage.setItem('bangapda_user', JSON.stringify(mockUser));
+}, []);
+
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // 목업 로그인 - 실제로는 서버 검증이 필요
