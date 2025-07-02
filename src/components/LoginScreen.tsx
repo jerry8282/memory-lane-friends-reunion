@@ -31,8 +31,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onForgotPassword }) =
       if (success) {
         toast({
           title: "로그인 성공! 🎉",
-          description: "반갑다 친구야에 오신 걸 환영합니다!",
+          description: "환영합니다! 다시 만날 인연을 찾으러 가볼까요?",
         });
+        
+        // 0.5초 후 메인 화면으로 자동 이동
+        setTimeout(() => {
+          onBack(); // 메인 화면으로 돌아가기
+        }, 500);
       } else {
         toast({
           title: "로그인 실패",
