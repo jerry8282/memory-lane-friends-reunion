@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Heart, MessageCircle, Calendar, MapPin, Shield, Flag } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Calendar, MapPin, X, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +27,7 @@ const ReceivedRequests: React.FC<ReceivedRequestsProps> = ({ onBack, onStartChat
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [acceptedRequests, setAcceptedRequests] = useState<Set<number>>(new Set());
   const [blockedRequests, setBlockedRequests] = useState<Set<number>>(new Set());
+  const [skippedRequests, setSkippedRequests] = useState<Set<number>>(new Set());
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -91,13 +92,11 @@ const ReceivedRequests: React.FC<ReceivedRequestsProps> = ({ onBack, onStartChat
   const handleAcceptRequest = (request: FriendRequest) => {
     setAcceptedRequests(prev => new Set([...prev, request.id]));
     
-    // 토스트 알림
     toast({
       title: "🎉 인연이 연결되었어요!",
       description: `${request.nickname}님과의 채팅을 시작할 수 있어요`,
     });
 
-    // 상대방에게도 알림이 전송된다는 가정하에 메시지 표시
     setTimeout(() => {
       toast({
         title: "📱 상대방에게 알림 전송",
@@ -105,21 +104,30 @@ const ReceivedRequests: React.FC<ReceivedRequestsProps> = ({ onBack, onStartChat
       });
     }, 1000);
 
-    // 채팅 시작
     setTimeout(() => {
       onStartChat(request.id, request);
     }, 2000);
   };
 
-  const handleBlockRequest = (requestId: number) => {
+  const handleBlockRequest = (requestId: number, nickname: string) => {
     setBlockedRequests(prev => new Set([...prev, requestId]));
     toast({
-      title: "차단 완료",
-      description: "해당 사용자를 차단했습니다",
+      title: "🚫 차단 완료",
+      description: `${nickname}님을 차단했습니다`,
     });
   };
 
-  const visibleRequests = requests.filter(req => !blockedRequests.has(req.id));
+  const handleSkipRequest = (requestId: number, nickname: string) => {
+    setSkippedRequests(prev => new Set([...prev, requestId]));
+    toast({
+      title: "👋 넘기기 완료",
+      description: `${nickname}님의 요청을 넘겼습니다`,
+    });
+  };
+
+  const visibleRequests = requests.filter(req => 
+    !blockedRequests.has(req.id) && !skippedRequests.has(req.id)
+  );
 
   return (
     <div className="space-y-6 pt-6">
@@ -210,12 +218,22 @@ const ReceivedRequests: React.FC<ReceivedRequestsProps> = ({ onBack, onStartChat
                           👋 반갑다 친구야
                         </Button>
                         <Button
-                          onClick={() => handleBlockRequest(request.id)}
+                          onClick={() => handleSkipRequest(request.id, request.nickname)}
                           variant="outline"
                           size="sm"
                           className="px-3 border-gray-200 text-gray-500 hover:bg-gray-50"
+                          title="넘기기 - 관심 없는 요청"
                         >
-                          <Shield className="w-4 h-4" />
+                          <EyeOff className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleBlockRequest(request.id, request.nickname)}
+                          variant="outline"
+                          size="sm"
+                          className="px-3 border-red-200 text-red-500 hover:bg-red-50"
+                          title="🚫 차단하기 - 완전히 차단"
+                        >
+                          <X className="w-4 h-4" />
                         </Button>
                       </>
                     )}
@@ -249,8 +267,9 @@ const ReceivedRequests: React.FC<ReceivedRequestsProps> = ({ onBack, onStartChat
       <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
         <h4 className="font-semibold text-orange-700 text-sm mb-2">🛡️ 프라이버시 보호</h4>
         <ul className="text-xs text-orange-600 space-y-1">
+          <li>• <EyeOff className="w-3 h-3 inline mr-1" />넘기기: 관심 없는 요청을 임시로 숨깁니다</li>
+          <li>• <X className="w-3 h-3 inline mr-1" />차단하기: 해당 사용자를 완전히 차단합니다</li>
           <li>• 인연 수락 전까지 실명과 사진은 공개되지 않아요</li>
-          <li>• 불편한 요청은 차단하거나 신고할 수 있어요</li>
           <li>• 모든 대화는 양방향 수락 후에만 시작됩니다</li>
         </ul>
       </div>

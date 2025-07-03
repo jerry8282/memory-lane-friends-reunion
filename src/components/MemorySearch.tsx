@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Search, MapPin, Calendar, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Search, MapPin, Calendar, GraduationCap, Mic, Image, Map } from 'lucide-react';
 
 interface SearchData {
   year: string;
@@ -24,6 +25,8 @@ const MemorySearch: React.FC<MemorySearchProps> = ({ onBack, onSearchComplete })
     location: '',
     additionalInfo: ''
   });
+
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +50,30 @@ const MemorySearch: React.FC<MemorySearchProps> = ({ onBack, onSearchComplete })
     '직장 초년차',
     '기타'
   ];
+
+  const locationSuggestions = [
+    '서울특별시 강남구',
+    '서울특별시 강북구',
+    '서울특별시 마포구',
+    '부산광역시 해운대구',
+    '부산광역시 부산진구',
+    '대구광역시 달서구',
+    '인천광역시 연수구',
+    '대전광역시 유성구',
+    '광주광역시 북구',
+    '울산광역시 남구'
+  ];
+
+  const handleLocationInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchData({...searchData, location: value});
+    setShowLocationSuggestions(value.length > 0);
+  };
+
+  const handleLocationSelect = (location: string) => {
+    setSearchData({...searchData, location});
+    setShowLocationSuggestions(false);
+  };
 
   return (
     <div className="space-y-6 pt-6">
@@ -114,15 +141,44 @@ const MemorySearch: React.FC<MemorySearchProps> = ({ onBack, onSearchComplete })
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
+            <div className="relative">
               <Label htmlFor="location" className="text-sm text-gray-600">장소 (학교명, 동네명 등)</Label>
-              <Input
-                id="location"
-                placeholder="예: 압구정초등학교, 유성구 학원가, 강남역 근처"
-                value={searchData.location}
-                onChange={(e) => setSearchData({...searchData, location: e.target.value})}
-                className="mt-1"
-              />
+              <div className="flex gap-2 mt-1">
+                <Input
+                  id="location"
+                  placeholder="예: 압구정초등학교, 유성구 학원가, 강남역 근처"
+                  value={searchData.location}
+                  onChange={handleLocationInputChange}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="px-3"
+                  title="지도에서 선택"
+                >
+                  <Map className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              {showLocationSuggestions && (
+                <div className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg mt-1">
+                  {locationSuggestions
+                    .filter(loc => loc.toLowerCase().includes(searchData.location.toLowerCase()))
+                    .slice(0, 5)
+                    .map((location, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                        onClick={() => handleLocationSelect(location)}
+                      >
+                        {location}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="additionalInfo" className="text-sm text-gray-600">추가 기억 (선택사항)</Label>
@@ -134,6 +190,39 @@ const MemorySearch: React.FC<MemorySearchProps> = ({ onBack, onSearchComplete })
                 className="mt-1"
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* 새로운 매칭 단서 섹션 */}
+        <Card className="border-orange-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-orange-500" />
+              추가 매칭 단서 (선택사항)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto p-3 flex flex-col items-center gap-2 border-orange-200 hover:bg-orange-50"
+              >
+                <Mic className="w-5 h-5 text-orange-500" />
+                <span className="text-xs text-gray-600">음성 메모</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto p-3 flex flex-col items-center gap-2 border-green-200 hover:bg-green-50"
+              >
+                <Image className="w-5 h-5 text-green-500" />
+                <span className="text-xs text-gray-600">추억 사진</span>
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 text-center">
+              소리나 사진으로 더 생생한 기억을 남겨보세요
+            </p>
           </CardContent>
         </Card>
 

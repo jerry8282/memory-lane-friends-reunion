@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Heart, MapPin, Clock, Users, LogOut, MessageCircle } from 'lucide-react';
+import { Heart, MapPin, Clock, Users, LogOut, MessageCircle, Mic, Image } from 'lucide-react';
 import MemorySearch from '@/components/MemorySearch';
 import FriendMatches from '@/components/FriendMatches';
 import ProfileSetup from '@/components/ProfileSetup';
@@ -31,6 +32,10 @@ const Index = () => {
     }
   };
 
+  const handleLogoClick = () => {
+    setCurrentView('home');
+  };
+
   const handleStartChat = (friendId: number, friendInfo: any) => {
     setChatFriend(friendInfo);
     setCurrentView('chat');
@@ -47,23 +52,23 @@ const Index = () => {
       <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-purple-100 z-10">
         <div className="max-w-md mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div 
+              className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleLogoClick}
+            >
               <Heart className="w-6 h-6 text-purple-500" />
               <h1 className="text-lg font-bold text-gray-800">반갑다 친구야</h1>
             </div>
             <div className="flex items-center gap-2">
               {isAuthenticated && (
-                <>
-                  <span className="text-sm text-gray-600">안녕하세요, {user?.nickname}님</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setCurrentView('profile')}
-                    className="text-purple-600"
-                  >
-                    프로필
-                  </Button>
-                </>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setCurrentView('profile')}
+                  className="text-purple-600"
+                >
+                  프로필
+                </Button>
               )}
               <Button 
                 variant="ghost" 
@@ -106,7 +111,7 @@ const Index = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                  {isAuthenticated ? `${user?.nickname}님, 그때 그 친구를 찾아보세요` : '그때 그 친구를 찾아보세요'}
+                  그때 그 친구를 찾아보세요
                 </h2>
                 <p className="text-gray-600 leading-relaxed">
                   기억 속 장소와 시간만으로<br />
@@ -166,6 +171,34 @@ const Index = () => {
                     <div>
                       <h3 className="font-semibold text-gray-800">시간으로 기억하기</h3>
                       <p className="text-sm text-gray-600">함께했던 년도, 학년으로 검색</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-100 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Mic className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">소리로 기억하기</h3>
+                      <p className="text-sm text-gray-600">음성 메모로 추억 기록하기</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-green-100 shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Image className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">사진으로 기억하기</h3>
+                      <p className="text-sm text-gray-600">추억 사진으로 장소와 시간 찾기</p>
                     </div>
                   </div>
                 </CardContent>
